@@ -21,7 +21,7 @@
         </div>
         <div class="nav-center">
           <button class="nav-btn" id="prev-btn" title="Previous Slide"><i class="fas fa-chevron-left"></i></button>
-          <span class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">9</span></span>
+          <span class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">11</span></span>
           <button class="nav-btn" id="next-btn" title="Next Slide"><i class="fas fa-chevron-right"></i></button>
         </div>
         <div class="nav-right">
@@ -263,6 +263,72 @@
             </div>
           </div>
         </section>
+        <!-- Slide 11: Digital Agreement Signing -->
+        <section class="slide" id="slide-11">
+          <div class="slide-content panel agreement-slide">
+            <h2 class="slide-header"><i class="fas fa-file-signature"></i>Service Agreement & Digital Signing</h2>
+            <div class="agreement-scrollbox">
+              <div class="agreement-text">
+                <h3>FILM PRODUCTION SERVICE AGREEMENT</h3>
+                <p><b>This Agreement</b> is made on this <input type="text" class="input-date" placeholder="___"> day of <input type="text" class="input-date" placeholder="________">, 2025, by and between:</p>
+                <h4>PARTIES</h4>
+                <b>1. Service Provider</b><br>
+                Name: Sreedrisya Media<br>
+                Address: Hyderabad, Telangana<br>
+                Contact: <a href="mailto:vaitahavya@sreedrisyamedia.com">vaitahavya@sreedrisyamedia.com</a> | +91-63096-97306<br>
+                Representative: Vaitahavya Vadlamani (Director)<br><br>
+                <b>2. Client</b><br>
+                Name: <input type="text" id="clientName" placeholder="Client Name" required><br>
+                Address: <input type="text" id="clientAddress" placeholder="Client Address" required><br>
+                Contact: <input type="email" id="clientEmail" placeholder="Client Email" required> | <input type="text" id="clientPhone" placeholder="Client Phone" required><br>
+                Representative: <input type="text" id="clientRep" placeholder="Client Representative" required><br>
+                <hr>
+                <!-- (Agreement body omitted for brevity, but would be included here) -->
+                <p>... (Agreement body as above) ...</p>
+                <hr>
+                <h4>Signatures</h4>
+                <div class="signatures-block">
+                  <div class="signature-party">
+                    <b>For Sreedrisya Media</b><br>
+                    Name: Vaitahavya Vadlamani<br>
+                    <img src="vaitahavya-signature.jpg" alt="Vaitahavya Signature" class="signature-img" style="max-width:180px; display:block; margin:8px auto; background:#fff; border:1px solid #bbb; border-radius:6px;">
+                    Date: <span id="providerDateDisplay">___ / ___ / 2025</span>
+                  </div>
+                  <div class="signature-party">
+                    <b>For Aajubaaju.in</b><br>
+                    Name: <span id="clientSignName">[Client Name]</span><br>
+                    <label>Signature:<br>
+                      <canvas id="clientSignature" width="220" height="60" style="border:1px solid #ccc; background:#fff;"></canvas>
+                      <div style="margin:8px 0;">or<br><input type="file" id="clientSignatureUpload" accept="image/png, image/jpeg"></div>
+                    </label><br>
+                    Date: <input type="date" id="clientSignDate" required>
+                  </div>
+                </div>
+                <div class="account-details">
+                  <h4>Payment Account Details</h4>
+                  <ul>
+                    <li><b>Name:</b> SREE DRISYA MEDIA</li>
+                    <li><b>Account Type:</b> CURRENT</li>
+                    <li><b>Account No:</b> 050811100001130</li>
+                    <li><b>Address:</b> YATRA NIVAS, SIMHACHALAM, A.P</li>
+                    <li><b>IFSC:</b> UBIN0805084</li>
+                    <li><b>UPI ID:</b> sreedrisyamedia@uboi</li>
+                  </ul>
+                </div>
+                <div class="payment-upload">
+                  <label>Attach Payment Proof (PDF/JPG/PNG):
+                    <input type="file" id="paymentProof" accept=".pdf,.jpg,.jpeg,.png" required>
+                  </label>
+                </div>
+                <div class="agreement-actions">
+                  <button id="submitAgreementBtn" class="btn-primary">Submit & Sign</button>
+                  <button id="downloadAgreementBtn" class="btn-secondary" disabled>Download PDF</button>
+                </div>
+                <div id="agreementStatus" class="agreement-status"></div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
       <!-- Progress Bar -->
       <div class="slide-footer">
@@ -272,6 +338,8 @@
       </div>
     </div>
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html> 
