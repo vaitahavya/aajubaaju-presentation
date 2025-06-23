@@ -1,3 +1,4 @@
+document.addEventListener("DOMContentLoaded", function() {
 const slides = document.querySelectorAll('.slide');
 const totalSlides = slides.length;
 const currentSlideElem = document.getElementById('current-slide');
@@ -144,7 +145,7 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Supabase Edge Function integration for email sending
-async function sendAgreementEmail({ clientName, clientAddress, clientEmail, clientPhone, clientRep, clientSignDate, paymentProofDataUrl, // Pass data URL instead of storage URL signatureDataUrl }) {
+async function sendAgreementEmail({ clientName, clientAddress, clientEmail, clientPhone, clientRep, clientSignDate, paymentProofUrl, signatureDataUrl }) {
   try {
     const response = await fetch(`${supabaseUrl}/functions/v1/send-agreement-email`, {
       method: 'POST',
@@ -159,7 +160,7 @@ async function sendAgreementEmail({ clientName, clientAddress, clientEmail, clie
         client_phone: clientPhone,
         client_rep: clientRep,
         client_sign_date: clientSignDate,
-        payment_proof_url: paymentProofDataUrl, // Store data URL instead of storage URL
+        payment_proof_url: paymentProofUrl,
         signature_data_url: signatureDataUrl,
         to_email: 'vaitahavya@sreedrisyamedia.com',
       }),
@@ -212,28 +213,18 @@ if (submitAgreementBtn) {
       return;
     }
     
-    agreementStatus.textContent = 'Processing agreement...';
+    agreementStatus.textContent = 'Submitting...';
     agreementStatus.style.color = 'var(--primary-green)';
-    // Process payment proof if provided
-    let paymentProofDataUrl = '';
-    if (paymentProof) {
-      try {
-        const reader = new FileReader();
-        paymentProofDataUrl = await new Promise((resolve, reject) => {
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(paymentProof);
-        });
-        console.log('Payment proof converted to data URL successfully');
-      } catch (err) {
-        console.error('Failed to process payment proof:', err);
-        agreementStatus.textContent = 'Failed to process payment proof.';
-        agreementStatus.style.color = 'red';
-        return;
-      }
-    } else {
-      console.log('No payment proof provided');
-    }      agreementStatus.style.color = 'red';
+    // Upload payment proof to Supabase Storage
+    const paymentFileName = `payment_${Date.now()}_${paymentProof.name}`;
+    let paymentProofUrl = '';
+    try {
+      const { data: uploadData, error: uploadError } = await supabase.storage.from('agreements').upload(paymentFileName, paymentProof, { upsert: true });
+      if (uploadError) throw uploadError;
+      paymentProofUrl = `${supabaseUrl}/storage/v1/object/public/agreements/${paymentFileName}`;
+    } catch (err) {
+      agreementStatus.textContent = 'Failed to upload payment proof.';
+      agreementStatus.style.color = 'red';
       return;
     }
     // Insert agreement record
@@ -246,7 +237,7 @@ if (submitAgreementBtn) {
         client_rep: clientRep,
         client_sign_date: clientSignDate,
         signature_data_url: signatureDataUrl,
-        payment_proof_url: paymentProofDataUrl, // Store data URL instead of storage URL
+        payment_proof_url: paymentProofUrl,
         submitted_at: new Date().toISOString()
       }
     ]);
@@ -262,7 +253,7 @@ if (submitAgreementBtn) {
       clientPhone,
       clientRep,
       clientSignDate,
-      paymentProofDataUrl, // Pass data URL instead of storage URL
+      paymentProofUrl,
       signatureDataUrl
     });
     downloadAgreementBtn.disabled = false;
@@ -333,4 +324,4 @@ if (clientNameInput && clientSignName) {
   clientNameInput.addEventListener('input', function() {
     clientSignName.textContent = this.value || '[Client Name]';
   });
-} 
+} });
