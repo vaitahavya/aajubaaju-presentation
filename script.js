@@ -200,8 +200,8 @@ if (submitAgreementBtn) {
       signatureDataUrl = null;
     }
     // Enhanced validation
-    if (!clientName || !clientAddress || !clientEmail || !clientPhone || !clientRep || !clientSignDate || !paymentProof) {
-      agreementStatus.textContent = 'Please fill all required fields and attach payment proof.';
+    if (!clientName || !clientAddress || !clientEmail || !clientPhone || !clientRep || !clientSignDate) {
+      agreementStatus.textContent = 'Please fill all required fields.';
       agreementStatus.style.color = 'red';
       return;
     }
@@ -212,21 +212,28 @@ if (submitAgreementBtn) {
       return;
     }
     
-    agreementStatus.textContent = 'Processing payment proof...';
+    agreementStatus.textContent = 'Processing agreement...';
     agreementStatus.style.color = 'var(--primary-green)';
-    // Convert payment proof file to data URL instead of uploading to storage
-    // Convert payment proof file to data URL instead of uploading to storage
+    // Process payment proof if provided
     let paymentProofDataUrl = '';
-    try {
-      const reader = new FileReader();
-      paymentProofDataUrl = await new Promise((resolve, reject) => {
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(paymentProof);
-      });
-      console.log('Payment proof converted to data URL successfully');
-    } catch (err) {      agreementStatus.textContent = 'Failed to upload payment proof.';
-      agreementStatus.style.color = 'red';
+    if (paymentProof) {
+      try {
+        const reader = new FileReader();
+        paymentProofDataUrl = await new Promise((resolve, reject) => {
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(paymentProof);
+        });
+        console.log('Payment proof converted to data URL successfully');
+      } catch (err) {
+        console.error('Failed to process payment proof:', err);
+        agreementStatus.textContent = 'Failed to process payment proof.';
+        agreementStatus.style.color = 'red';
+        return;
+      }
+    } else {
+      console.log('No payment proof provided');
+    }      agreementStatus.style.color = 'red';
       return;
     }
     // Insert agreement record
