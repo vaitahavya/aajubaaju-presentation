@@ -634,4 +634,37 @@ body {
 .legal-delivery-slide .legal-list {
   margin-top: 2vh;
   font-size: 1.1rem;
+}
+
+.budget-upper {
+  color: var(--accent-orange);
+  font-weight: bold;
+  font-size: 1.2em;
+}
+.budget-total-label {
+  margin-top: 18px;
+  font-size: 1.15em;
+  color: var(--primary-green);
+  font-weight: 700;
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 8px 0;
+}
+.timeline-bar .timeline-phase {
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  border-right: 2px solid #fff;
+}
+.timeline-bar .timeline-phase:last-child {
+  border-right: none;
+}
+
+.budget-range-highlight {
+  color: var(--accent-orange);
+  font-weight: bold;
+  font-size: 1.2em;
+  background: #fffbe6;
+  border-radius: 6px;
+  padding: 2px 8px;
+  margin: 0 2px;
 } 
