@@ -68,6 +68,7 @@ const ctx = clientSignatureCanvas ? clientSignatureCanvas.getContext('2d') : nul
 let drawing = false;
 let lastX = 0;
 let lastY = 0;
+let hasDrawnSignature = false; // Track if user has drawn on canvas
 
 function startDraw(e) {
   drawing = true;
@@ -84,6 +85,7 @@ function draw(e) {
   ctx.lineTo(x, y);
   ctx.stroke();
   [lastX, lastY] = [x, y];
+  hasDrawnSignature = true; // Mark that user has drawn
 }
 function stopDraw() {
   drawing = false;
@@ -98,7 +100,21 @@ function getCanvasPos(e) {
 }
 function clearSignature() {
   ctx.clearRect(0, 0, clientSignatureCanvas.width, clientSignatureCanvas.height);
+  hasDrawnSignature = false; // Reset drawn signature flag
+  clientSignatureImageDataUrl = null; // Reset uploaded signature
+  // Show canvas again if it was hidden
+  clientSignatureCanvas.style.display = 'block';
+  const previewImg = document.getElementById('clientSignaturePreview');
+  if (previewImg) {
+    previewImg.remove();
+  }
 }
+
+// Check if signature exists (either drawn or uploaded)
+function hasSignature() {
+  return hasDrawnSignature || clientSignatureImageDataUrl !== null;
+}
+
 if (clientSignatureCanvas) {
   clientSignatureCanvas.addEventListener('mousedown', startDraw);
   clientSignatureCanvas.addEventListener('mousemove', draw);
@@ -178,15 +194,24 @@ if (submitAgreementBtn) {
     let signatureDataUrl;
     if (clientSignatureImageDataUrl) {
       signatureDataUrl = clientSignatureImageDataUrl;
-    } else {
+    } else if (hasDrawnSignature) {
       signatureDataUrl = clientSignatureCanvas.toDataURL();
+    } else {
+      signatureDataUrl = null;
     }
-    // Simple validation
+    // Enhanced validation
     if (!clientName || !clientAddress || !clientEmail || !clientPhone || !clientRep || !clientSignDate || !paymentProof) {
-      agreementStatus.textContent = 'Please fill all fields and attach payment proof.';
+      agreementStatus.textContent = 'Please fill all required fields and attach payment proof.';
       agreementStatus.style.color = 'red';
       return;
     }
+    
+    if (!hasSignature()) {
+      agreementStatus.textContent = 'Please provide a signature (draw or upload).';
+      agreementStatus.style.color = 'red';
+      return;
+    }
+    
     agreementStatus.textContent = 'Submitting...';
     agreementStatus.style.color = 'var(--primary-green)';
     // Upload payment proof to Supabase Storage
@@ -265,6 +290,7 @@ if (clientSignatureUpload) {
       const reader = new FileReader();
       reader.onload = function(evt) {
         clientSignatureImageDataUrl = evt.target.result;
+        hasDrawnSignature = false; // Reset drawn signature since we're using uploaded one
         // Show preview in place of canvas
         let img = document.getElementById('clientSignaturePreview');
         if (!img) {
