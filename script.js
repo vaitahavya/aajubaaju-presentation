@@ -9,9 +9,14 @@ const progressFill = document.querySelector('.progress-fill');
 
 let currentSlide = 0;
 
+// Debug logging
+console.log('Total slides found:', totalSlides);
+console.log('Slides:', Array.from(slides).map(slide => slide.id));
+
 totalSlidesElem.textContent = totalSlides;
 
 function showSlide(index) {
+    console.log('Showing slide:', index + 1, 'of', totalSlides);
     slides.forEach((slide, i) => {
         slide.classList.toggle('active', i === index);
     });
@@ -20,16 +25,22 @@ function showSlide(index) {
 }
 
 function nextSlide() {
+    console.log('Next slide requested. Current:', currentSlide, 'Total:', totalSlides);
     if (currentSlide < totalSlides - 1) {
         currentSlide++;
         showSlide(currentSlide);
+    } else {
+        console.log('Already at last slide');
     }
 }
 
 function prevSlide() {
+    console.log('Prev slide requested. Current:', currentSlide);
     if (currentSlide > 0) {
         currentSlide--;
         showSlide(currentSlide);
+    } else {
+        console.log('Already at first slide');
     }
 }
 
