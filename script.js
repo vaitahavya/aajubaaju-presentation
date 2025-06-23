@@ -138,13 +138,13 @@ const downloadAgreementBtn = document.getElementById('downloadAgreementBtn');
 const agreementStatus = document.getElementById('agreementStatus');
 
 // Supabase integration
-// Using global Supabase client
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 const supabaseUrl = 'https://egrklpnmgvhvnyhaevvs.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVncmtscG5tZ3Zodm55aGFldnZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2ODYyMzksImV4cCI6MjA2NjI2MjIzOX0.vs6GalWVoyaArKbO_vu64SG6di4t5S0Tidl3f0M-xPY';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Supabase Edge Function integration for email sending
-async function sendAgreementEmail({ clientName, clientAddress, clientEmail, clientPhone, clientRep, clientSignDate, paymentProofUrl, signatureDataUrl }) {
+async function sendAgreementEmail({ clientName, clientAddress, clientEmail, clientPhone, clientRep, clientSignDate, paymentProofDataUrl, // Pass data URL instead of storage URL signatureDataUrl }) {
   try {
     const response = await fetch(`${supabaseUrl}/functions/v1/send-agreement-email`, {
       method: 'POST',
@@ -159,7 +159,7 @@ async function sendAgreementEmail({ clientName, clientAddress, clientEmail, clie
         client_phone: clientPhone,
         client_rep: clientRep,
         client_sign_date: clientSignDate,
-        payment_proof_url: paymentProofUrl,
+        payment_proof_url: paymentProofDataUrl, // Store data URL instead of storage URL
         signature_data_url: signatureDataUrl,
         to_email: 'vaitahavya@sreedrisyamedia.com',
       }),
@@ -215,11 +215,11 @@ if (submitAgreementBtn) {
     agreementStatus.textContent = 'Processing agreement...';
     agreementStatus.style.color = 'var(--primary-green)';
     // Process payment proof if provided
-    let paymentProofUrl = '';
+    let paymentProofDataUrl = '';
     if (paymentProof) {
       try {
         const reader = new FileReader();
-        paymentProofUrl = await new Promise((resolve, reject) => {
+        paymentProofDataUrl = await new Promise((resolve, reject) => {
           reader.onload = () => resolve(reader.result);
           reader.onerror = reject;
           reader.readAsDataURL(paymentProof);
@@ -233,8 +233,7 @@ if (submitAgreementBtn) {
       }
     } else {
       console.log('No payment proof provided');
-    }      agreementStatus.textContent = 'Failed to upload payment proof.';
-      agreementStatus.style.color = 'red';
+    }      agreementStatus.style.color = 'red';
       return;
     }
     // Insert agreement record
@@ -247,7 +246,7 @@ if (submitAgreementBtn) {
         client_rep: clientRep,
         client_sign_date: clientSignDate,
         signature_data_url: signatureDataUrl,
-        payment_proof_url: paymentProofUrl,
+        payment_proof_url: paymentProofDataUrl, // Store data URL instead of storage URL
         submitted_at: new Date().toISOString()
       }
     ]);
@@ -263,7 +262,7 @@ if (submitAgreementBtn) {
       clientPhone,
       clientRep,
       clientSignDate,
-      paymentProofUrl,
+      paymentProofDataUrl, // Pass data URL instead of storage URL
       signatureDataUrl
     });
     downloadAgreementBtn.disabled = false;
